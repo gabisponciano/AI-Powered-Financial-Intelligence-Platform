@@ -17,7 +17,7 @@ async def upload_file(file: UploadFile = File(...), session: Session = Depends(g
     elif file.filename.endswith(".xlsx"):
         df = pd.read_excel(io.BytesIO(content))
     else:
-        return {"error": "Formato não suportado"}
+        raise HTTPException(status_code=400, detail="Formato não suportado. Envie .csv ou .xlsx")
 
     df.columns = df.columns.str.lower()
     df = normalize_dataframe(df)
@@ -52,12 +52,8 @@ async def upload_file(file: UploadFile = File(...), session: Session = Depends(g
     session.bulk_save_objects(transactions)
     session.commit()
 
-    # ✅ atualiza status
     upload.status = "done"
     session.commit()
-
-#     # ⚡ processar em background
-#     bg.add_task(process_dataframe, df, upload_id)
 
     return {
         "message": "Arquivo recebido e em processamento",

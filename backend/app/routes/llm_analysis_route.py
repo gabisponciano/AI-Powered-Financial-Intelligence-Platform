@@ -39,55 +39,7 @@ def classify_single(
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
  
- 
-@llm_analysis_router.post("/classify-batch")
-def classify_batch(upload_id: int = Query(...), db: Session = Depends(get_db)):
-    """
-    Classifica TODAS as transações de um upload que não possuem categoria,
-    usando uma única chamada ao LLaMA 3 (batch eficiente).
-    Persiste as categorias no banco de dados.
-    """
-    transactions = (
-        db.query(Transaction)
-        .filter(
-            Transaction.upload_id == upload_id,
-            (Transaction.category == None) | (Transaction.category == ""),
-        )
-        .all()
-    )
- 
-    if not transactions:
-        return {"message": "Todas as transações já possuem categoria.", "classified": 0}
- 
-    batch = [
-        {
-            "description": t.description or "",
-            "amount": t.amount or 0,
-            "customer": t.customer or "",
-        }
-        for t in transactions
-    ]
- 
-    try:
-        categories = classify_transactions_batch(batch)
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
- 
-    # Persiste no banco
-    for t, cat in zip(transactions, categories):
-        t.category = cat
- 
-    db.commit()
- 
-    return {
-        "message": "Classificação concluída.",
-        "classified": len(transactions),
-        "preview": [
-            {"id": t.id, "description": t.description, "category": cat}
-            for t, cat in zip(transactions[:10], categories[:10])
-        ],
-    }
- 
+
  
 @llm_analysis_router.get("/insights")
 def insights(upload_id: int = Query(...), db: Session = Depends(get_db)):
