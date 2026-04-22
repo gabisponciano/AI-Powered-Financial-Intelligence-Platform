@@ -1,7 +1,7 @@
 from langchain_ollama.llms import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 
-model = OllamaLLM(model="llama3")
+_model = None  # Cache
 
 template = """
 Você é um especialista financeiro analisando transações de um sistema financeiro.
@@ -16,8 +16,16 @@ Pergunta: {question}
 Responda em português, de forma clara e objetiva. Se envolver valores, formate em reais (R$).
 """
 
+def get_model():
+    """Inicializa o modelo na primeira utilização (lazy loading)"""
+    global _model
+    if _model is None:
+        _model = OllamaLLM(model="llama3")
+    return _model
+
 def rag_config(context: str, question: str) -> str:
     prompt = ChatPromptTemplate.from_template(template)
+    model = get_model()  # ← Inicializa aqui, não no import
     chain = prompt | model
     result = chain.invoke({"context": context, "question": question})
     return result
