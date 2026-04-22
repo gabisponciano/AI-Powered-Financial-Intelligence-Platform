@@ -15,7 +15,7 @@ type View = 'dashboard' | 'chat' | 'insights' | 'anomalias' | 'clientes'
 
 const PAGE_TITLES: Record<View, string> = {
   dashboard: 'Dashboard',
-  chat: 'Chat IA',
+  chat: 'Assistente Virtual',
   insights: 'Insights',
   anomalias: 'Anomalias',
   clientes: 'Clientes',

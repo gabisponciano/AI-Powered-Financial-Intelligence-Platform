@@ -15,12 +15,61 @@ export function UploadModal({ onClose, onSuccess, uploadFn, uploading }: UploadM
   const [dragging, setDragging] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [done, setDone] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleFile(f: File) {
+  try {
+    console.log('📁 Arquivo selecionado:', f)
+
+    if (!f.name.endsWith('.csv') && !f.name.endsWith('.xlsx')) {
+      const msg = 'Por favor, envie um arquivo CSV ou XLSX'
+      console.warn(msg)
+      setError(msg)
+      return
+    }
+
     setFile(f)
-    const id = await uploadFn(f)
-    if (id) { setDone(true); setTimeout(() => { onSuccess(id); onClose() }, 1200) }
+    setError(null)
+
+    console.log('🚀 Iniciando upload...')
+
+    const response = await uploadFn(f)
+
+    console.log('✅ Resposta do backend:', response)
+
+    // ⚠️ Aqui depende do que seu backend retorna
+    const id = response?.upload_id ?? response?.id ?? response
+
+    if (id !== null && id !== undefined) {
+      setDone(true)
+      console.log('🎉 Upload concluído com sucesso. ID:', id)
+
+      setTimeout(() => {
+        onSuccess(id)
+        onClose()
+      }, 1200)
+    } else {
+      throw new Error('Resposta inválida do backend')
+    }
+
+  } catch (err: any) {
+    console.error('❌ Erro no upload:', err)
+
+    let message = 'Erro desconhecido ao fazer upload'
+
+    if (err.message) {
+      message = err.message
+    }
+
+    // Se vier erro do FastAPI (texto)
+    if (typeof err === 'string') {
+      message = err
+    }
+
+    setError(message)
+    setFile(null)
   }
+}
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">
@@ -43,45 +92,58 @@ export function UploadModal({ onClose, onSuccess, uploadFn, uploading }: UploadM
             <span className="text-sm">Upload concluído!</span>
           </div>
         ) : (
-          <div
-            onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(e) => {
-              e.preventDefault(); setDragging(false)
-              const f = e.dataTransfer.files[0]
-              if (f) handleFile(f)
-            }}
-            onClick={() => inputRef.current?.click()}
-            className={clsx(
-              'relative flex flex-col items-center justify-center gap-3 py-12 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200',
-              dragging
-                ? 'border-accent-green bg-accent-green-dim'
-                : 'border-bg-border hover:border-text-muted bg-bg-elevated'
-            )}
-          >
-            <input
-              ref={inputRef}
-              type="file"
-              accept=".csv,.xlsx"
-              className="hidden"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
-            />
-            {uploading ? (
-              <Loader2 size={28} className="text-accent-green animate-spin" />
-            ) : file ? (
-              <FileText size={28} className="text-accent-green" />
-            ) : (
-              <Upload size={28} className="text-text-muted" />
-            )}
-            <div className="text-center">
-              <p className="text-sm text-text-primary">
-                {uploading ? 'Processando...' : file ? file.name : 'Arraste ou clique para selecionar'}
-              </p>
-              {!file && !uploading && (
-                <p className="text-xs text-text-muted mt-1">.csv ou .xlsx</p>
+          <>
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault()
+                setDragging(false)
+                const f = e.dataTransfer.files[0]
+                if (f) handleFile(f)
+              }}
+              onClick={() => {
+                console.log('Click on drop area')
+                inputRef.current?.click()
+              }}
+              className={clsx(
+                'relative flex flex-col items-center justify-center gap-3 py-12 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200 min-h-48',
+                dragging
+                  ? 'border-accent-green bg-accent-green-dim'
+                  : 'border-bg-border hover:border-accent-green/50 bg-bg-elevated'
               )}
+            >
+              <input
+                ref={inputRef}
+                type="file"
+                accept=".csv,.xlsx"
+                className="hidden"
+                onChange={(e) => { 
+                  console.log('File input changed')
+                  const f = e.target.files?.[0]
+                  if (f) handleFile(f) 
+                }}
+              />
+              {uploading ? (
+                <Loader2 size={28} className="text-accent-green animate-spin" />
+              ) : file ? (
+                <FileText size={28} className="text-accent-green" />
+              ) : (
+                <Upload size={28} className="text-text-muted" />
+              )}
+              <div className="text-center">
+                <p className="text-sm text-text-primary">
+                  {uploading ? 'Processando...' : file ? file.name : 'Arraste ou clique para selecionar'}
+                </p>
+                {!file && !uploading && (
+                  <p className="text-xs text-text-muted mt-1">.csv ou .xlsx</p>
+                )}
+              </div>
             </div>
-          </div>
+            {error && (
+              <p className="text-xs text-accent-red mt-3 text-center">{error}</p>
+            )}
+          </>
         )}
       </div>
     </div>

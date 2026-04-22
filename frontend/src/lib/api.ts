@@ -1,10 +1,13 @@
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 async function req<T>(path: string, options?: RequestInit): Promise<T> {
+  const isFormData = options?.body instanceof FormData
+
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: isFormData ? undefined : { 'Content-Type': 'application/json' },
     ...options,
   })
+
   if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`)
   return res.json()
 }
@@ -13,7 +16,7 @@ async function req<T>(path: string, options?: RequestInit): Promise<T> {
 export async function uploadFile(file: File) {
   const form = new FormData()
   form.append('file', file)
-  const res = await fetch(`${BASE}/upload/upload`, { method: 'POST', body: form })
+  const res = await fetch(`${BASE}/upload/file_upload`, { method: 'POST', body: form })
   if (!res.ok) throw new Error(await res.text())
   return res.json()
 }

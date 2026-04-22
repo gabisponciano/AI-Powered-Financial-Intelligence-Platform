@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 
 upload_router = APIRouter(prefix="/upload", tags=["upload"])
 
-@upload_router.post("/upload")
+@upload_router.post("/file_upload")
 async def upload_file(file: UploadFile = File(...), session: Session = Depends(get_db)):
     content = await file.read()
 

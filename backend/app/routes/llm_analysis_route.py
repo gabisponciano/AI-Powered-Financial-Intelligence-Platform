@@ -4,7 +4,6 @@ from app.dependencies import get_db, get_df_from_db
 from app.models import Transaction
 from app.services.llm_service import (
     classify_transaction,
-    classify_transactions_batch,
     generate_insights,
     explain_anomalies,
     natural_language_query,
@@ -39,7 +38,6 @@ def classify_single(
     except RuntimeError as e:
         raise HTTPException(status_code=503, detail=str(e))
  
-
  
 @llm_analysis_router.get("/insights")
 def insights(upload_id: int = Query(...), db: Session = Depends(get_db)):

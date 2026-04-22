@@ -13,7 +13,7 @@ Contexto das transações:
 
 Pergunta: {question}
 
-Responda em português, de forma clara e objetiva. Se envolver valores, formate em reais (R$).
+Responda em português, de forma clara e objetiva. Se envolver valores, formate em reais (R$). Se envolver datas coloque no formato DD/MM/YYYY.
 """
 
 def get_model():
@@ -25,7 +25,7 @@ def get_model():
 
 def rag_config(context: str, question: str) -> str:
     prompt = ChatPromptTemplate.from_template(template)
-    model = get_model()  # ← Inicializa aqui, não no import
+    model = get_model() 
     chain = prompt | model
     result = chain.invoke({"context": context, "question": question})
     return result

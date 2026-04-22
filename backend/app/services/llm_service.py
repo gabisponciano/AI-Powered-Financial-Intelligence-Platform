@@ -71,58 +71,13 @@ def classify_transaction(description: str, amount: float, customer: str = "") ->
             return cat
     return "Outro"
 
-
-def classify_transactions_batch(transactions: list[dict]) -> list[str]:
-    """
-    Classifica um lote de transações em uma única chamada ao LLM
-    para economizar tempo (melhor do que N chamadas individuais).
-    """
-    if not transactions:
-        return []
-
-    lines = []
-    for i, t in enumerate(transactions):
-        lines.append(
-            f"{i+1}. Descrição: {t.get('description', 'N/A')} | "
-            f"Valor: R$ {float(t.get('amount', 0)):.2f} | "
-            f"Cliente: {t.get('customer', 'N/A')}"
-        )
-
-    prompt = (
-        f"Classifique cada transação abaixo em UMA categoria da lista: "
-        f"{', '.join(CATEGORIES)}.\n\n"
-        f"Responda SOMENTE com o número e a categoria, um por linha. Exemplo:\n"
-        f"1. Alimentação\n2. Transporte\n\n"
-        f"Transações:\n" + "\n".join(lines)
-    )
-
-    result = _call_ollama(prompt, system=CLASSIFY_SYSTEM, temperature=0.1)
-
-    # Parseia as linhas da resposta
-    categories = []
-    result_lines = [l.strip() for l in result.strip().split("\n") if l.strip()]
-
-    for i in range(len(transactions)):
-        found = "Outro"
-        # Procura pela linha "N. Categoria"
-        for line in result_lines:
-            if line.startswith(f"{i+1}.") or line.startswith(f"{i+1} "):
-                for cat in CATEGORIES:
-                    if cat.lower() in line.lower():
-                        found = cat
-                        break
-                break
-        categories.append(found)
-
-    return categories
-
 # 2. GERAÇÃO DE INSIGHTS AUTOMÁTICOS
 
 INSIGHTS_SYSTEM = (
     "Você é um analista financeiro especialista em dados de vendas e recebíveis. "
     "Analise os KPIs fornecidos e gere insights claros, diretos e acionáveis em português. "
     "Foque em: oportunidades de melhoria, riscos e tendências. "
-    "Seja conciso e prático."
+    "Seja conciso e prático. Se envolver datas coloque no formato DD/MM/YYYY"
 )
 
 

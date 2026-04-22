@@ -8,7 +8,7 @@ import clsx from 'clsx'
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'chat', label: 'Chat IA', icon: MessageSquare },
+  { id: 'chat', label: 'Assistente Virtual', icon: MessageSquare },
   { id: 'insights', label: 'Insights', icon: Lightbulb },
   { id: 'anomalias', label: 'Anomalias', icon: AlertTriangle },
   { id: 'clientes', label: 'Clientes', icon: BarChart2 },

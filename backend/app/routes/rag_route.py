@@ -30,12 +30,10 @@ def ask(payload: QuestionRequest, session: Session = Depends(get_db)):
     if not transactions:
         raise HTTPException(status_code=404, detail="Nenhuma transação encontrada")
 
-    # 🔹 Aumenta k para perguntas que envolvem agregações
     question_lower = payload.question.lower()
     is_aggregate = any(kw in question_lower for kw in AGGREGATE_KEYWORDS)
-    k = 50 if is_aggregate else 10
+    k = 50 if is_aggregate else 30
 
-    # 🔹 Passa upload_id para o retriever aplicar o filtro correto
     retriever = build_retriever_from_db(
         transactions=transactions,
         upload_id=payload.upload_id,
