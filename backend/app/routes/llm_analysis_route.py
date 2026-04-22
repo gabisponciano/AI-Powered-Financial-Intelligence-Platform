@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Query, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
-from app.dependencies import get_db, get_df_from_db
+from backend.app.databases.dependencies import get_db, get_df_from_db
 from app.models import Transaction
 from app.services.llm_service import (
-    classify_transaction,
     generate_insights,
     explain_anomalies,
     natural_language_query,
@@ -12,32 +11,6 @@ from app.services.llm_service import (
 
 llm_analysis_router = APIRouter(prefix="/llm_analysis", tags=["llm_analysis"])
 
-
-@llm_analysis_router.post("/classify")
-def classify_single(
-    payload: dict = Body(..., example={
-        "description": "Pagamento de licença de software",
-        "amount": 1500.00,
-        "customer": "Empresa XYZ"
-    })
-):
-    """
-    Classifica UMA transação em uma categoria usando o LLaMA 3.
-    Útil para categorizar transações novas em tempo real.
-    """
-    description = payload.get("description", "")
-    amount = float(payload.get("amount", 0))
-    customer = payload.get("customer", "")
- 
-    if not description:
-        raise HTTPException(status_code=400, detail="Campo 'description' é obrigatório.")
- 
-    try:
-        category = classify_transaction(description, amount, customer)
-        return {"category": category}
-    except RuntimeError as e:
-        raise HTTPException(status_code=503, detail=str(e))
- 
  
 @llm_analysis_router.get("/insights")
 def insights(upload_id: int = Query(...), db: Session = Depends(get_db)):
@@ -116,7 +89,6 @@ def anomalias_ia(upload_id: int = Query(...), db: Session = Depends(get_db)):
             "description": getattr(row, "description", None),
             "date": str(getattr(row, "date", "")) if getattr(row, "date", None) else None,
             "status": getattr(row, "status", None),
-            "category": getattr(row, "category", None),
         })
  
     stats = {"mean": mean, "std": std, "threshold": threshold}

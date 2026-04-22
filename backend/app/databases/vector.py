@@ -36,7 +36,6 @@ def build_retriever_from_db(transactions: List, upload_id: Optional[int] = None,
                 f"Transação realizada em {t.date}. "
                 f"Valor de {t.amount} reais. "
                 f"Descrição: {t.description or 'não informada'}. "
-                f"Categoria: {t.category or 'não informada'}. "
                 f"Status: {t.status or 'não informado'}. "
                 f"Cliente: {t.customer or 'não informado'}."
             )
@@ -46,7 +45,6 @@ def build_retriever_from_db(transactions: List, upload_id: Optional[int] = None,
                 "transaction_id": t.id,
                 "data": t.date.isoformat(),
                 "amount": t.amount,
-                "category": t.category or "",
                 "status": t.status or "",
                 "customer": t.customer or "",
             }

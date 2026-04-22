@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 import pandas as pd
 import io
-from app.dependencies import get_db
+from backend.app.databases.dependencies import get_db
 from app.models import Upload, Transaction
 from app.services.preprocessing import normalize_dataframe
 from sqlalchemy.orm import Session
@@ -43,8 +43,6 @@ async def upload_file(file: UploadFile = File(...), session: Session = Depends(g
             status=row.get("status"),
             customer=row.get("customer"),
             description=row.get("description"),
-            category=row.get("category"),
-            anomaly=0,
             raw_data=row.to_dict()
         )
         transactions.append(t)

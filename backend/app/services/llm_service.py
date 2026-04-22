@@ -40,37 +40,6 @@ def _call_ollama(prompt: str, system: Optional[str] = None, temperature: float =
         raise RuntimeError(f"Erro ao chamar Ollama: {str(e)}")
 
 
-# 1. CLASSIFICAÇÃO DE CATEGORIA
-
-CATEGORIES = [
-    "Alimentação", "Transporte", "Saúde", "Educação",
-    "Tecnologia", "Serviços", "Varejo", "Entretenimento",
-    "Financeiro", "Outro"
-]
-
-CLASSIFY_SYSTEM = (
-    "Você é um classificador de transações financeiras. "
-    "Responda APENAS com o nome da categoria, sem explicações. "
-    f"Categorias disponíveis: {', '.join(CATEGORIES)}."
-)
-
-
-def classify_transaction(description: str, amount: float, customer: str = "") -> str:
-    """Classifica uma transação em uma categoria usando o LLM."""
-    prompt = (
-        f"Classifique esta transação financeira:\n"
-        f"Descrição: {description}\n"
-        f"Valor: R$ {amount:.2f}\n"
-        f"Cliente: {customer}\n\n"
-        f"Responda com UMA ÚNICA categoria da lista."
-    )
-    result = _call_ollama(prompt, system=CLASSIFY_SYSTEM, temperature=0.1)
-
-    for cat in CATEGORIES:
-        if cat.lower() in result.lower():
-            return cat
-    return "Outro"
-
 # 2. GERAÇÃO DE INSIGHTS AUTOMÁTICOS
 
 INSIGHTS_SYSTEM = (
@@ -223,7 +192,6 @@ def natural_language_query(question: str, df_summary: dict) -> str:
         f"- Menor transação: R$ {df_summary.get('menor_transacao', 0):.2f}\n"
         f"- Taxa inadimplência: {df_summary.get('taxa_inadimplencia', 0):.1f}%\n"
         f"- Top 5 clientes por receita: {df_summary.get('top_clientes', 'N/A')}\n"
-        f"- Categorias mais frequentes: {df_summary.get('top_categorias', 'N/A')}\n"
         f"- Distribuição por status: {df_summary.get('status_dist', 'N/A')}\n"
     )
 
@@ -259,12 +227,6 @@ def build_df_summary(df: pd.DataFrame) -> dict:
         top = pago.groupby("customer")["amount"].sum().nlargest(5)
         top_clientes = "; ".join([f"{k} (R$ {v:.0f})" for k, v in top.items()])
 
-    # Top categorias
-    top_categorias = ""
-    if "category" in df.columns and df["category"].notna().any():
-        top = df["category"].value_counts().head(5)
-        top_categorias = "; ".join([f"{k} ({v})" for k, v in top.items()])
-
     # Distribuição status
     status_dist = ""
     if "status" in df.columns:
@@ -282,6 +244,5 @@ def build_df_summary(df: pd.DataFrame) -> dict:
         "data_inicio": data_inicio,
         "data_fim": data_fim,
         "top_clientes": top_clientes,
-        "top_categorias": top_categorias,
         "status_dist": status_dist,
     }

@@ -5,7 +5,7 @@ import { UploadModal } from '@/components/ui/UploadModal'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { KpiCards } from '@/components/dashboard/KpiCards'
 import { EvolucaoChart } from '@/components/dashboard/EvolucaoChart'
-import { TopClientes, TopCategorias } from '@/components/dashboard/Rankings'
+import { TopClientes } from '@/components/dashboard/Rankings'
 import { InsightsPanel } from '@/components/dashboard/InsightsPanel'
 import { AnomaliasPanel } from '@/components/dashboard/AnomaliasPanel'
 import { TransactionsList } from '@/components/dashboard/TransactionsList'
@@ -128,7 +128,6 @@ export default function Home() {
                 {mountedViews.clientes && (
                   <div className={clsx(view === 'clientes' ? 'block' : 'hidden', 'p-6 grid grid-cols-1 lg:grid-cols-2 gap-4')}>
                     <TopClientes uploadId={uploadId} />
-                    <TopCategorias uploadId={uploadId} />
                   </div>
                 )}
               </>

@@ -34,10 +34,6 @@ export async function fetchPorCliente(uploadId: number) {
   return req<ClienteItem[]>(`/analysis/por-cliente?upload_id=${uploadId}`)
 }
 
-export async function fetchPorCategoria(uploadId: number) {
-  return req<CategoriaItem[]>(`/analysis/por-categoria?upload_id=${uploadId}`)
-}
-
 export async function fetchAnomalias(uploadId: number) {
   return req<AnomaliaItem[]>(`/analysis/anomalias?upload_id=${uploadId}`)
 }
@@ -48,7 +44,6 @@ export async function fetchTransacoes(params: FetchTransacoesParams) {
   if (params.status) qs.set('status', params.status)
   if (params.q) qs.set('q', params.q)
   if (params.customer) qs.set('customer', params.customer)
-  if (params.category) qs.set('category', params.category)
   if (params.minAmount != null) qs.set('min_amount', String(params.minAmount))
   if (params.maxAmount != null) qs.set('max_amount', String(params.maxAmount))
   if (params.startDate) qs.set('start_date', params.startDate)
@@ -104,11 +99,10 @@ export interface EvolucaoItem {
 }
 
 export interface ClienteItem { cliente: string; receita: number }
-export interface CategoriaItem { categoria: string; total: number }
 export interface AnomaliaItem {
   id: number; amount: number; customer: string
   description: string; date: string; status: string; motivo: string
-  category?: string
+
 }
 
 export interface TransacaoItem {
@@ -118,7 +112,7 @@ export interface TransacaoItem {
   status: string | null
   customer: string | null
   description: string | null
-  category: string | null
+
 }
 
 export interface TransacoesResponse {
@@ -131,12 +125,11 @@ export interface FetchTransacoesParams {
   status?: string
   q?: string
   customer?: string
-  category?: string
   minAmount?: number | null
   maxAmount?: number | null
   startDate?: string
   endDate?: string
-  sortBy?: 'date' | 'amount' | 'customer' | 'status' | 'category' | 'id'
+  sortBy?: 'date' | 'amount' | 'customer' | 'status' | 'id'
   sortDir?: 'asc' | 'desc'
   limit?: number
   offset?: number

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from app.database import Base
+from backend.app.databases.database import Base
 
 
 class Upload(Base):
@@ -27,9 +27,7 @@ class Transaction(Base):
 
     customer = Column(String)
     description = Column(String)
-    category = Column(String)
 
-    anomaly = Column(Integer)
     raw_data = Column(JSON, nullable=True)
 
     upload = relationship("Upload", back_populates="transactions")

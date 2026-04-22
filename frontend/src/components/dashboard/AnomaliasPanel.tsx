@@ -55,7 +55,6 @@ function AnomaliaCard({ a, index }: { a: AnomaliaEnrichedItem; index: number }) 
           <div className="grid grid-cols-3 gap-2 mt-3 text-xs text-text-muted font-mono" style={{ fontFamily: 'var(--font-mono)' }}>
             <span>Data: {a.date ? new Date(a.date).toLocaleDateString('pt-BR') : '—'}</span>
             <span>Status: {a.status}</span>
-            <span>Cat: {a.category ?? '—'}</span>
           </div>
         </div>
       )}

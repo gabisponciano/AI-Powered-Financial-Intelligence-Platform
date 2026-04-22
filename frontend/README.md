@@ -45,7 +45,6 @@ src/
 | KpiCards | `GET /analysis/kpis` |
 | EvolucaoChart | `GET /analysis/evolucao` |
 | TopClientes | `GET /analysis/por-cliente` |
-| TopCategorias | `GET /analysis/por-categoria` |
 | InsightsPanel | `GET /llm_analysis/insights` |
 | AnomaliasPanel | `GET /llm_analysis/anomalias-ia` |
 | ChatPanel | `POST /rag/ask` |

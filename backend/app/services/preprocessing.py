@@ -1,3 +1,5 @@
+import pandas as pd
+
 def normalize_dataframe(df):
     df.columns = df.columns.str.lower()
 

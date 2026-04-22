@@ -12,7 +12,6 @@ interface Message {
 
 const SUGGESTIONS = [
   'Qual cliente tem maior risco de inadimplência?',
-  'Quais categorias têm mais transações atrasadas?',
   'Qual foi o mês com maior receita?',
   'Resuma os principais padrões das transações',
 ]

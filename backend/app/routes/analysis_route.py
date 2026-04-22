@@ -2,7 +2,7 @@ from fastapi import APIRouter, Query, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import date, datetime, time
-from app.dependencies import get_db, get_df_from_db
+from backend.app.databases.dependencies import get_db, get_df_from_db
 from app.models import Transaction
 
 
@@ -71,19 +71,6 @@ def por_cliente(upload_id: int = Query(...), db: Session = Depends(get_db)):
 
 
 
-@analysis_router.get("/por-categoria")
-def por_categoria(upload_id: int = Query(...), db: Session = Depends(get_db)):
-
-    df = get_df_from_db(db, upload_id)
-
-    if df.empty or "category" not in df.columns:
-        return []
-
-    cat = df.groupby("category")["amount"].sum().reset_index()
-    cat.columns = ["categoria", "total"]
-
-    return cat.sort_values("total", ascending=False).to_dict(orient="records")
-
 
 @analysis_router.get("/anomalias")
 def anomalias(upload_id: int = Query(...), db: Session = Depends(get_db)):
@@ -106,9 +93,8 @@ def anomalias(upload_id: int = Query(...), db: Session = Depends(get_db)):
 def transacoes(
     upload_id: int = Query(...),
     status: str | None = Query(None),
-    q: str | None = Query(None, description="Busca por texto em cliente/descrição/categoria"),
+    q: str | None = Query(None, description="Busca por texto em cliente/descrição"),
     customer: str | None = Query(None),
-    category: str | None = Query(None),
     min_amount: float | None = Query(None),
     max_amount: float | None = Query(None),
     start_date: date | None = Query(None),
@@ -128,16 +114,11 @@ def transacoes(
         pattern = f"%{customer.strip().lower()}%"
         query = query.filter(func.lower(Transaction.customer).like(pattern))
 
-    if category:
-        pattern = f"%{category.strip().lower()}%"
-        query = query.filter(func.lower(Transaction.category).like(pattern))
-
     if q:
         pattern = f"%{q.strip().lower()}%"
         query = query.filter(
             func.lower(Transaction.customer).like(pattern)
             | func.lower(Transaction.description).like(pattern)
-            | func.lower(Transaction.category).like(pattern)
         )
 
     if min_amount is not None:
@@ -157,7 +138,6 @@ def transacoes(
         "amount": Transaction.amount,
         "customer": Transaction.customer,
         "status": Transaction.status,
-        "category": Transaction.category,
         "id": Transaction.id,
     }
     sort_col = sort_map.get(sort_by, Transaction.date)
@@ -179,7 +159,6 @@ def transacoes(
                 "status": t.status,
                 "customer": t.customer,
                 "description": t.description,
-                "category": t.category,
             }
             for t in items
         ],

@@ -50,7 +50,6 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
   const [status, setStatus] = useState('')
   const [q, setQ] = useState('')
   const [customer, setCustomer] = useState('')
-  const [category, setCategory] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
   const [minAmount, setMinAmount] = useState<string>('')
@@ -64,7 +63,6 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
 
   const qDebounced = useDebounced(q, 350)
   const customerDebounced = useDebounced(customer, 350)
-  const categoryDebounced = useDebounced(category, 350)
 
   const [data, setData] = useState<TransacoesResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -80,7 +78,6 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
       status: status || undefined,
       q: qDebounced.trim() || undefined,
       customer: customerDebounced.trim() || undefined,
-      category: categoryDebounced.trim() || undefined,
       startDate: startDate || undefined,
       endDate: endDate || undefined,
       minAmount: minAmount.trim() === '' ? null : Number(minAmount),
@@ -95,7 +92,6 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
       status,
       qDebounced,
       customerDebounced,
-      categoryDebounced,
       startDate,
       endDate,
       minAmount,
@@ -119,13 +115,12 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
   // Reset paginação quando filtros mudarem
   useEffect(() => {
     setOffset(0)
-  }, [uploadId, status, qDebounced, customerDebounced, categoryDebounced, startDate, endDate, minAmount, maxAmount])
+  }, [uploadId, status, qDebounced, customerDebounced,  startDate, endDate, minAmount, maxAmount])
 
   function resetFilters() {
     setStatus('')
     setQ('')
     setCustomer('')
-    setCategory('')
     setStartDate('')
     setEndDate('')
     setMinAmount('')
@@ -170,7 +165,7 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
               <input
                 className={clsx(inputClass, 'pl-9')}
-                placeholder="Buscar (cliente, descrição, categoria)"
+                placeholder="Buscar (cliente, descrição)"
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
               />
@@ -189,13 +184,6 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
             placeholder="Cliente"
             value={customer}
             onChange={(e) => setCustomer(e.target.value)}
-          />
-
-          <input
-            className={inputClass}
-            placeholder="Categoria"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
           />
 
           <div className="grid grid-cols-2 gap-3 lg:col-span-6">
@@ -290,7 +278,6 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
               <th className="text-left px-5 py-3 whitespace-nowrap">Data</th>
               <th className="text-left px-5 py-3 whitespace-nowrap">Cliente</th>
               <th className="text-left px-5 py-3 min-w-[360px]">Descrição</th>
-              <th className="text-left px-5 py-3 whitespace-nowrap">Categoria</th>
               <th className="text-left px-5 py-3 whitespace-nowrap">Status</th>
               <th className="text-right px-5 py-3 whitespace-nowrap">Valor</th>
             </tr>
@@ -320,7 +307,6 @@ export function TransactionsList({ uploadId }: { uploadId: number }) {
                   <td className="px-5 py-3 whitespace-nowrap text-text-secondary">{fmtDate(t.date)}</td>
                   <td className="px-5 py-3 whitespace-nowrap text-text-primary">{t.customer ?? '—'}</td>
                   <td className="px-5 py-3 text-text-secondary">{t.description ?? '—'}</td>
-                  <td className="px-5 py-3 whitespace-nowrap text-text-secondary">{t.category ?? '—'}</td>
                   <td className="px-5 py-3 whitespace-nowrap"><StatusBadge status={t.status} /></td>
                   <td className="px-5 py-3 whitespace-nowrap text-right font-mono text-text-primary" style={{ fontFamily: 'var(--font-mono)' }}>
                     {fmtMoney(t.amount)}

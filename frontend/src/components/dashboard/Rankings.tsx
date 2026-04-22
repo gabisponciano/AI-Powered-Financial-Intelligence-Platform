@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { fetchPorCliente, fetchPorCategoria, ClienteItem, CategoriaItem } from '@/lib/api'
+import { fetchPorCliente, ClienteItem } from '@/lib/api'
 
 function fmt(n: number) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
@@ -58,47 +58,3 @@ export function TopClientes({ uploadId }: { uploadId: number }) {
 }
 
 const CAT_COLORS = ['#00e5a0', '#3b82f6', '#f59e0b', '#ff4d6d', '#a855f7', '#ec4899']
-
-export function TopCategorias({ uploadId }: { uploadId: number }) {
-  const [data, setData] = useState<CategoriaItem[]>([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchPorCategoria(uploadId).then((d) => setData(d.slice(0, 6))).finally(() => setLoading(false))
-  }, [uploadId])
-
-  const total = data.reduce((s, c) => s + c.total, 0)
-
-  return (
-    <div className="bg-bg-surface border border-bg-border rounded-xl p-5">
-      <h3 className="text-sm uppercase tracking-widest text-text-secondary mb-5" style={{ fontFamily: 'var(--font-mono)' }}>
-        Categorias
-      </h3>
-      {loading ? (
-        <div className="space-y-4">{Array(5).fill(0).map((_, i) => (
-          <div key={i} className="space-y-2">
-            <div className="h-3 rounded shimmer-bg" style={{ width: `${70 - i * 8}%` }} />
-            <div className="h-1.5 rounded shimmer-bg" />
-          </div>
-        ))}</div>
-      ) : (
-        <div className="space-y-4">
-          {data.map((c, i) => (
-            <div key={c.categoria} className="animate-slide-up" style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}>
-              <div className="flex justify-between items-center mb-1.5">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: CAT_COLORS[i] }} />
-                  <span className="text-sm text-text-primary">{c.categoria}</span>
-                </div>
-                <span className="text-xs text-text-muted font-mono" style={{ fontFamily: 'var(--font-mono)' }}>
-                  {total > 0 ? ((c.total / total) * 100).toFixed(0) : 0}%
-                </span>
-              </div>
-              <Bar value={c.total} max={data[0]?.total ?? 1} color={CAT_COLORS[i]} />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
