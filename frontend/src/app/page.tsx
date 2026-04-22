@@ -8,14 +8,16 @@ import { EvolucaoChart } from '@/components/dashboard/EvolucaoChart'
 import { TopClientes, TopCategorias } from '@/components/dashboard/Rankings'
 import { InsightsPanel } from '@/components/dashboard/InsightsPanel'
 import { AnomaliasPanel } from '@/components/dashboard/AnomaliasPanel'
+import { TransactionsList } from '@/components/dashboard/TransactionsList'
 import { ChatPanel } from '@/components/chat/ChatPanel'
 import { useUpload } from '@/hooks/useUpload'
 
-type View = 'dashboard' | 'chat' | 'insights' | 'anomalias' | 'clientes'
+type View = 'dashboard' | 'transacoes' | 'insights' | 'anomalias' | 'clientes'
 
 const PAGE_TITLES: Record<View, string> = {
   dashboard: 'Dashboard',
-  chat: 'Assistente Virtual',
+  transacoes: 'Transações',
+  // chat: 'Assistente Virtual',
   insights: 'Insights',
   anomalias: 'Anomalias',
   clientes: 'Clientes',
@@ -25,6 +27,7 @@ export default function Home() {
   const [view, setView] = useState<View>('dashboard')
   const [showUpload, setShowUpload] = useState(false)
   const { upload, uploading, uploadId, setUploadId } = useUpload()
+  
 
   function handleUploadSuccess(id: number) {
     setUploadId(id)
@@ -80,11 +83,16 @@ export default function Home() {
             ) : (
               <>
                 {view === 'dashboard' && <DashboardView uploadId={uploadId} />}
-                {view === 'chat' && (
+                {view === 'transacoes' && (
+                  <div className="p-6">
+                    <TransactionsList uploadId={uploadId} />
+                  </div>
+                )}
+                {/* {view === 'chat' && (
                   <div className="h-full">
                     <ChatPanel uploadId={uploadId} />
                   </div>
-                )}
+                )} */}
                 {view === 'insights' && (
                   <div className="p-6">
                     <InsightsPanel uploadId={uploadId} />
@@ -135,7 +143,7 @@ function DashboardView({ uploadId }: { uploadId: number }) {
       <EvolucaoChart uploadId={uploadId} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <TopClientes uploadId={uploadId} />
-        <TopCategorias uploadId={uploadId} />
+        {/* <TopCategorias uploadId={uploadId} /> */}
       </div>
       <InsightsPanel uploadId={uploadId} />
     </div>

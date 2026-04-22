@@ -18,58 +18,22 @@ export function UploadModal({ onClose, onSuccess, uploadFn, uploading }: UploadM
   const [error, setError] = useState<string | null>(null)
 
   async function handleFile(f: File) {
-  try {
-    console.log('📁 Arquivo selecionado:', f)
-
     if (!f.name.endsWith('.csv') && !f.name.endsWith('.xlsx')) {
-      const msg = 'Por favor, envie um arquivo CSV ou XLSX'
-      console.warn(msg)
-      setError(msg)
+      setError('Por favor, envie um arquivo CSV ou XLSX')
       return
     }
-
+    
     setFile(f)
     setError(null)
-
-    console.log('🚀 Iniciando upload...')
-
-    const response = await uploadFn(f)
-
-    console.log('✅ Resposta do backend:', response)
-
-    // ⚠️ Aqui depende do que seu backend retorna
-    const id = response?.upload_id ?? response?.id ?? response
-
-    if (id !== null && id !== undefined) {
+    const id = await uploadFn(f)
+    if (id !== null) { 
       setDone(true)
-      console.log('🎉 Upload concluído com sucesso. ID:', id)
-
-      setTimeout(() => {
-        onSuccess(id)
-        onClose()
-      }, 1200)
+      setTimeout(() => { onSuccess(id); onClose() }, 1200) 
     } else {
-      throw new Error('Resposta inválida do backend')
+      setError('Erro ao fazer upload do arquivo')
+      setFile(null)
     }
-
-  } catch (err: any) {
-    console.error('❌ Erro no upload:', err)
-
-    let message = 'Erro desconhecido ao fazer upload'
-
-    if (err.message) {
-      message = err.message
-    }
-
-    // Se vier erro do FastAPI (texto)
-    if (typeof err === 'string') {
-      message = err
-    }
-
-    setError(message)
-    setFile(null)
   }
-}
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-fade-in">

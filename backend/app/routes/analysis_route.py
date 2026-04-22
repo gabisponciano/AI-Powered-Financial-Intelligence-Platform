@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Query, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
+from datetime import date, datetime, time
 from app.dependencies import get_db, get_df_from_db
+from app.models import Transaction
 
 
 analysis_router = APIRouter(prefix="/analysis", tags=["analysis"])
@@ -98,4 +101,86 @@ def anomalias(upload_id: int = Query(...), db: Session = Depends(get_db)):
 
     return anomalias.head(10).to_dict(orient="records")
 
- 
+
+@analysis_router.get("/transacoes")
+def transacoes(
+    upload_id: int = Query(...),
+    status: str | None = Query(None),
+    q: str | None = Query(None, description="Busca por texto em cliente/descrição/categoria"),
+    customer: str | None = Query(None),
+    category: str | None = Query(None),
+    min_amount: float | None = Query(None),
+    max_amount: float | None = Query(None),
+    start_date: date | None = Query(None),
+    end_date: date | None = Query(None),
+    sort_by: str = Query("date"),
+    sort_dir: str = Query("desc"),
+    limit: int = Query(25, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    db: Session = Depends(get_db),
+):
+    query = db.query(Transaction).filter(Transaction.upload_id == upload_id)
+
+    if status:
+        query = query.filter(Transaction.status == status)
+
+    if customer:
+        pattern = f"%{customer.strip().lower()}%"
+        query = query.filter(func.lower(Transaction.customer).like(pattern))
+
+    if category:
+        pattern = f"%{category.strip().lower()}%"
+        query = query.filter(func.lower(Transaction.category).like(pattern))
+
+    if q:
+        pattern = f"%{q.strip().lower()}%"
+        query = query.filter(
+            func.lower(Transaction.customer).like(pattern)
+            | func.lower(Transaction.description).like(pattern)
+            | func.lower(Transaction.category).like(pattern)
+        )
+
+    if min_amount is not None:
+        query = query.filter(Transaction.amount >= min_amount)
+
+    if max_amount is not None:
+        query = query.filter(Transaction.amount <= max_amount)
+
+    if start_date:
+        query = query.filter(Transaction.date >= datetime.combine(start_date, time.min))
+
+    if end_date:
+        query = query.filter(Transaction.date <= datetime.combine(end_date, time.max))
+
+    sort_map = {
+        "date": Transaction.date,
+        "amount": Transaction.amount,
+        "customer": Transaction.customer,
+        "status": Transaction.status,
+        "category": Transaction.category,
+        "id": Transaction.id,
+    }
+    sort_col = sort_map.get(sort_by, Transaction.date)
+    if sort_dir.lower() == "asc":
+        query = query.order_by(sort_col.asc(), Transaction.id.asc())
+    else:
+        query = query.order_by(sort_col.desc(), Transaction.id.desc())
+
+    total = query.order_by(None).count()
+    items = query.offset(offset).limit(limit).all()
+
+    return {
+        "total": total,
+        "items": [
+            {
+                "id": t.id,
+                "date": t.date.isoformat() if t.date else None,
+                "amount": t.amount,
+                "status": t.status,
+                "customer": t.customer,
+                "description": t.description,
+                "category": t.category,
+            }
+            for t in items
+        ],
+    }

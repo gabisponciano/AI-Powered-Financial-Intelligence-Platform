@@ -66,7 +66,7 @@ export function KpiCards({ uploadId }: { uploadId: number }) {
     { label: 'Receita Total', value: fmt(data.receita_total), icon: <TrendingUp size={14} />, accent: 'green' as const },
     { label: 'Ticket Médio', value: fmt(data.ticket_medio), icon: <BarChart2 size={14} />, accent: 'blue' as const },
     { label: 'Transações', value: data.total_transacoes.toLocaleString('pt-BR'), icon: <CreditCard size={14} />, accent: 'green' as const },
-    { label: 'Inadimplência', value: `${data.taxa_inadimplencia.toFixed(1)}%`, icon: <AlertCircle size={14} />, accent: 'red' as const },
+    { label: 'Taxa de Inadimplência', value: `${data.taxa_inadimplencia.toFixed(1)}%`, icon: <AlertCircle size={14} />, accent: 'red' as const },
     { label: 'Valor Pendente', value: fmt(data.valor_pendente), icon: <Clock size={14} />, accent: 'amber' as const },
     { label: 'Inadimplentes', value: data.inadimplentes_count.toLocaleString('pt-BR'), icon: <Users size={14} />, accent: 'red' as const },
   ] : Array(6).fill(null)

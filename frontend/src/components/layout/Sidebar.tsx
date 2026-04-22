@@ -2,13 +2,13 @@
 import { useState } from 'react'
 import {
   LayoutDashboard, MessageSquare, Lightbulb, AlertTriangle,
-  BarChart2, Upload, ChevronRight, Zap
+  BarChart2, Upload, ChevronRight, Zap, List
 } from 'lucide-react'
 import clsx from 'clsx'
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'chat', label: 'Assistente Virtual', icon: MessageSquare },
+  { id: 'transacoes', label: 'Transações', icon: List },
   { id: 'insights', label: 'Insights', icon: Lightbulb },
   { id: 'anomalias', label: 'Anomalias', icon: AlertTriangle },
   { id: 'clientes', label: 'Clientes', icon: BarChart2 },
