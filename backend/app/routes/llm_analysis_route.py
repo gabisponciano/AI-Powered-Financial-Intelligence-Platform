@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Query, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
-from backend.app.databases.dependencies import get_db, get_df_from_db
+from app.databases.dependencies import get_db, get_df_from_db
 from app.models import Transaction
 from app.services.llm_service import (
     generate_insights,
@@ -51,7 +51,7 @@ def insights(upload_id: int = Query(...), db: Session = Depends(get_db)):
         top = pago_df.groupby("customer")["amount"].sum().nlargest(5).reset_index()
         top.columns = ["cliente", "receita"]
         top_clientes_data = top.to_dict(orient="records")
- 
+
     try:
         result = generate_insights(kpis_data, evolucao_data, top_clientes_data)
         return result

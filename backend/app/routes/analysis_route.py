@@ -2,7 +2,7 @@ from fastapi import APIRouter, Query, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import date, datetime, time
-from backend.app.databases.dependencies import get_db, get_df_from_db
+from app.databases.dependencies import get_db, get_df_from_db
 from app.models import Transaction
 
 
@@ -63,13 +63,34 @@ def por_cliente(upload_id: int = Query(...), db: Session = Depends(get_db)):
 
     if df.empty:
         return []
+    
+    df["customer"] = df["customer"].str.strip()
 
     pago = df[df["status"] == "pago"].groupby("customer")["amount"].sum().reset_index()
     pago.columns = ["cliente", "receita"]
 
     return pago.sort_values("receita", ascending=False).to_dict(orient="records")
 
+@analysis_router.get("/por-cliente-atraso")
+def por_cliente_atraso(upload_id: int = Query(...), db: Session = Depends(get_db)):
 
+    df = get_df_from_db(db, upload_id)
+
+    if df.empty:
+        return []
+    
+    df["customer"] = df["customer"].str.strip()
+
+    atrasado = (
+        df[df["status"] == "atrasado"]
+        .groupby("customer")["amount"]
+        .sum()
+        .reset_index()
+    )
+
+    atrasado.columns = ["cliente", "valor_atrasado"]
+
+    return atrasado.sort_values("valor_atrasado", ascending=False).to_dict(orient="records")
 
 
 @analysis_router.get("/anomalias")

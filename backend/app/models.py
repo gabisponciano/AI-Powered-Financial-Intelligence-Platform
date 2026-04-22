@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, Float, String, DateTime, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from backend.app.databases.database import Base
+from app.databases.database import Base
 
 
 class Upload(Base):

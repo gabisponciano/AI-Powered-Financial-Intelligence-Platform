@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 import pandas as pd
 import io
-from backend.app.databases.dependencies import get_db
+from app.databases.dependencies import get_db
 from app.models import Upload, Transaction
 from app.services.preprocessing import normalize_dataframe
 from sqlalchemy.orm import Session

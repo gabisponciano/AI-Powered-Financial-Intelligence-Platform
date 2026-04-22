@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { KpiCards } from '@/components/dashboard/KpiCards'
 import { EvolucaoChart } from '@/components/dashboard/EvolucaoChart'
 import { TopClientes } from '@/components/dashboard/Rankings'
+import { PiorClientes } from '@/components/dashboard/Rankings'
 import { InsightsPanel } from '@/components/dashboard/InsightsPanel'
 import { AnomaliasPanel } from '@/components/dashboard/AnomaliasPanel'
 import { TransactionsList } from '@/components/dashboard/TransactionsList'
@@ -128,6 +129,7 @@ export default function Home() {
                 {mountedViews.clientes && (
                   <div className={clsx(view === 'clientes' ? 'block' : 'hidden', 'p-6 grid grid-cols-1 lg:grid-cols-2 gap-4')}>
                     <TopClientes uploadId={uploadId} />
+                    <PiorClientes uploadId={uploadId} />
                   </div>
                 )}
               </>
@@ -157,6 +159,7 @@ function DashboardView({ uploadId }: { uploadId: number }) {
       <EvolucaoChart uploadId={uploadId} />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <TopClientes uploadId={uploadId} />
+        <PiorClientes uploadId={uploadId} />
         {/* <TopCategorias uploadId={uploadId} /> */}
       </div>
       {/* <InsightsPanel uploadId={uploadId} /> */}

@@ -34,6 +34,10 @@ export async function fetchPorCliente(uploadId: number) {
   return req<ClienteItem[]>(`/analysis/por-cliente?upload_id=${uploadId}`)
 }
 
+export async function fetchPiorCliente(uploadId: number) {
+  return req<PiorClienteItem[]>(`/analysis/por-cliente-atraso?upload_id=${uploadId}`)
+}
+
 export async function fetchAnomalias(uploadId: number) {
   return req<AnomaliaItem[]>(`/analysis/anomalias?upload_id=${uploadId}`)
 }
@@ -99,6 +103,7 @@ export interface EvolucaoItem {
 }
 
 export interface ClienteItem { cliente: string; receita: number }
+export interface PiorClienteItem { cliente: string; valor_atrasado: number }
 export interface AnomaliaItem {
   id: number; amount: number; customer: string
   description: string; date: string; status: string; motivo: string

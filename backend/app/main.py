@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
+from app.databases.database import init_db
 
 app = FastAPI()
 
@@ -13,6 +14,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+def _startup() -> None:
+    init_db()
 
 from app.routes.upload_route import upload_router
 from app.routes.analysis_route import analysis_router

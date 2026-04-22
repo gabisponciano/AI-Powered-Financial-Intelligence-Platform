@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from backend.app.databases.dependencies import get_db
+from app.databases.dependencies import get_db
 from app.models import Transaction
 from app.services.rag_service import rag_config
-from backend.app.databases.vector import build_retriever_from_db
+from app.databases.vector import build_retriever_from_db
 
 rag_router = APIRouter(prefix="/rag", tags=["rag"])
 

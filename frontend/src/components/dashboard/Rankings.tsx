@@ -1,9 +1,13 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { fetchPorCliente, ClienteItem } from '@/lib/api'
+import { fetchPorCliente, ClienteItem, fetchPiorCliente, PiorClienteItem } from '@/lib/api'
 
 function fmt(n: number) {
   return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(n)
+}
+
+function fmtAtraso(n: number) {
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 }).format(n)
 }
 
 function Bar({ value, max, color }: { value: number; max: number; color: string }) {
@@ -23,10 +27,15 @@ export function TopClientes({ uploadId }: { uploadId: number }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetchPorCliente(uploadId).then((d) => setData(d.slice(0, 6))).finally(() => setLoading(false))
+    fetchPorCliente(uploadId)
+      .then((d) => {
+        const top = [...d].sort((a, b) => b.receita - a.receita).slice(0, 6)
+        setData(top)
+      })
+      .finally(() => setLoading(false))
   }, [uploadId])
 
-  const max = data[0]?.receita ?? 1
+  const max = Math.max(1, ...data.map((c) => c.receita))
 
   return (
     <div className="bg-bg-surface border border-bg-border rounded-xl p-5">
@@ -40,6 +49,8 @@ export function TopClientes({ uploadId }: { uploadId: number }) {
             <div className="h-1.5 rounded shimmer-bg" />
           </div>
         ))}</div>
+      ) : data.length === 0 ? (
+        <p className="text-sm text-text-muted">Sem dados para exibir.</p>
       ) : (
         <div className="space-y-4">
           {data.map((c, i) => (
@@ -57,4 +68,50 @@ export function TopClientes({ uploadId }: { uploadId: number }) {
   )
 }
 
-const CAT_COLORS = ['#00e5a0', '#3b82f6', '#f59e0b', '#ff4d6d', '#a855f7', '#ec4899']
+export function PiorClientes({ uploadId }: { uploadId: number }) {
+  const [data, setData] = useState<PiorClienteItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchPiorCliente(uploadId)
+      .then((d) => {
+        const worst = [...d].sort((a, b) => b.valor_atrasado - a.valor_atrasado).slice(0, 6)
+        setData(worst)
+      })
+      .finally(() => setLoading(false))
+  }, [uploadId])
+
+  const max = Math.max(1, ...data.map((c) => c.valor_atrasado))
+
+  return (
+    <div className="bg-bg-surface border border-bg-border rounded-xl p-5">
+      <h3 className="text-sm uppercase tracking-widest text-text-secondary mb-5" style={{ fontFamily: 'var(--font-mono)' }}>
+        Piores Clientes (Atraso)
+      </h3>
+      {loading ? (
+        <div className="space-y-4">{Array(5).fill(0).map((_, i) => (
+          <div key={i} className="space-y-2">
+            <div className="h-3 rounded shimmer-bg" style={{ width: `${60 + i * 8}%` }} />
+            <div className="h-1.5 rounded shimmer-bg" />
+          </div>
+        ))}</div>
+      ) : data.length === 0 ? (
+        <p className="text-sm text-text-muted">Sem dados para exibir.</p>
+      ) : (
+        <div className="space-y-4">
+          {data.map((c, i) => (
+            <div key={c.cliente} className="animate-slide-up" style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'both' }}>
+              <div className="flex justify-between items-center mb-1.5">
+                <span className="text-sm text-text-primary truncate max-w-[60%]">{c.cliente}</span>
+                <span className="text-xs text-[#ff4d6d] font-mono" style={{ fontFamily: 'var(--font-mono)' }}>
+                  {fmtAtraso(c.valor_atrasado)}
+                </span>
+              </div>
+              <Bar value={c.valor_atrasado} max={max} color="#ff4d6d" />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
