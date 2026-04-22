@@ -4,7 +4,7 @@ import pandas as pd
 from typing import Optional
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "llama3"  # llama3 = LLaMA 3 8B no Ollama
+MODEL = "mistral"  # llama3 = LLaMA 3 8B no Ollama
 
 
 def _call_ollama(prompt: str, system: Optional[str] = None, temperature: float = 0.3) -> str:

@@ -20,7 +20,7 @@ def get_model():
     """Inicializa o modelo na primeira utilização (lazy loading)"""
     global _model
     if _model is None:
-        _model = OllamaLLM(model="llama3")
+        _model = OllamaLLM(model="mistral")
     return _model
 
 def rag_config(context: str, question: str) -> str:

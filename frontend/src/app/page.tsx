@@ -12,12 +12,12 @@ import { TransactionsList } from '@/components/dashboard/TransactionsList'
 import { ChatPanel } from '@/components/chat/ChatPanel'
 import { useUpload } from '@/hooks/useUpload'
 
-type View = 'dashboard' | 'transacoes' | 'insights' | 'anomalias' | 'clientes'
+type View = 'dashboard' | 'transacoes' |'chat' |'insights' | 'anomalias' | 'clientes'
 
 const PAGE_TITLES: Record<View, string> = {
   dashboard: 'Dashboard',
   transacoes: 'Transações',
-  // chat: 'Assistente Virtual',
+  chat: 'Assistente Virtual',
   insights: 'Insights',
   anomalias: 'Anomalias',
   clientes: 'Clientes',
@@ -88,11 +88,11 @@ export default function Home() {
                     <TransactionsList uploadId={uploadId} />
                   </div>
                 )}
-                {/* {view === 'chat' && (
+                {view === 'chat' && (
                   <div className="h-full">
                     <ChatPanel uploadId={uploadId} />
                   </div>
-                )} */}
+                )}
                 {view === 'insights' && (
                   <div className="p-6">
                     <InsightsPanel uploadId={uploadId} />
@@ -113,13 +113,6 @@ export default function Home() {
             )}
           </div>
         </main>
-
-        {/* Right chat sidebar — visible on dashboard only */}
-        {uploadId && view === 'dashboard' && (
-          <aside className="w-80 border-l border-bg-border bg-bg-surface flex flex-col overflow-hidden">
-            <ChatPanel uploadId={uploadId} />
-          </aside>
-        )}
       </div>
 
       {/* Upload modal */}

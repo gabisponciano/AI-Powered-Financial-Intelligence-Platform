@@ -5,9 +5,11 @@ import {
   BarChart2, Upload, ChevronRight, Zap, List
 } from 'lucide-react'
 import clsx from 'clsx'
+import { Label } from 'recharts'
 
 const NAV = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  {id: 'chat', label: 'Assistente VIrtual', icon: MessageSquare },
   { id: 'transacoes', label: 'Transações', icon: List },
   { id: 'insights', label: 'Insights', icon: Lightbulb },
   { id: 'anomalias', label: 'Anomalias', icon: AlertTriangle },
@@ -38,7 +40,7 @@ export function Sidebar({ active, onNavigate, uploadId, onUploadClick }: Sidebar
         </div>
         {!collapsed && (
           <span className="font-display font-700 text-lg tracking-tight text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>
-            Finflow
+            FinanciAI
           </span>
         )}
       </div>
