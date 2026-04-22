@@ -145,7 +145,7 @@ function DashboardView({ uploadId }: { uploadId: number }) {
         <TopClientes uploadId={uploadId} />
         {/* <TopCategorias uploadId={uploadId} /> */}
       </div>
-      <InsightsPanel uploadId={uploadId} />
+      {/* <InsightsPanel uploadId={uploadId} /> */}
     </div>
   )
 }

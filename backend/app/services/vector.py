@@ -44,7 +44,7 @@ def build_retriever_from_db(transactions: List, upload_id: Optional[int] = None,
             metadata = {
                 "upload_id": t.upload_id,
                 "transaction_id": t.id,
-                "date": t.date,
+                "data": t.date.isoformat(),
                 "amount": t.amount,
                 "category": t.category or "",
                 "status": t.status or "",
