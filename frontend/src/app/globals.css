@@ -13,8 +13,8 @@
 * { box-sizing: border-box; }
 
 html, body {
-  background-color: #0a0a0b;
-  color: #f0f0f4;
+  background-color: #F9F9FB;
+  color: #14151A;
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
 }
@@ -22,11 +22,11 @@ html, body {
 /* Scrollbar */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #222228; border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: #44445a; }
+::-webkit-scrollbar-thumb { background: #E6E7EE; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #C9CBD6; }
 
 /* Selection */
-::selection { background: #00e5a030; color: #00e5a0; }
+::selection { background: #6D28D930; color: #6D28D9; }
 
 /* Noise overlay */
 .noise::before {
@@ -40,7 +40,7 @@ html, body {
 }
 
 .shimmer-bg {
-  background: linear-gradient(90deg, #18181d 25%, #222228 50%, #18181d 75%);
+  background: linear-gradient(90deg, #F3F4F8 25%, #E6E7EE 50%, #F3F4F8 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

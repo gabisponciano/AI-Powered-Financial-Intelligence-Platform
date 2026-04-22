@@ -35,7 +35,7 @@ export function EmptyState({ onUpload }: { onUpload: () => void }) {
 
         <button
           onClick={onUpload}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-green text-bg-base text-sm font-500 hover:opacity-90 transition-opacity"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-accent-yellow text-text-primary text-sm font-500 hover:opacity-90 transition-opacity"
           style={{ fontWeight: 500 }}
         >
           Importar arquivo

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { TrendingUp, TrendingDown, Minus, AlertTriangle, Loader2, RefreshCw } from 'lucide-react'
 import { fetchInsights, Insight } from '@/lib/api'
 import clsx from 'clsx'
@@ -16,7 +16,7 @@ export function InsightsPanel({ uploadId }: { uploadId: number }) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true); setError(null)
     try {
       const res = await fetchInsights(uploadId)
@@ -26,9 +26,9 @@ export function InsightsPanel({ uploadId }: { uploadId: number }) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [uploadId])
 
-  useEffect(() => { load() }, [uploadId])
+  useEffect(() => { load() }, [load])
 
   return (
     <div className="bg-bg-surface border border-bg-border rounded-xl p-5 h-full">

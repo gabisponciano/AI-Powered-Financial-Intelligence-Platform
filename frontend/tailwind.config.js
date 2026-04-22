@@ -14,23 +14,28 @@ module.exports = {
       },
       colors: {
         bg: {
-          base: '#0a0a0b',
-          surface: '#111114',
-          elevated: '#18181d',
-          border: '#222228',
+          base: '#F9F9FB',      // off-white background
+          surface: '#FFFFFF',   // cards/panels
+          elevated: '#F3F4F8',  // subtle elevation
+          border: '#E6E7EE',    // separators
         },
         accent: {
-          green: '#00e5a0',
-          'green-dim': '#00e5a020',
+          // Brand
+          green: '#6D28D9', // purple (keeps existing classnames working)
+          'green-dim': '#6D28D920',
+          yellow: '#FBBF24',
+          'yellow-dim': '#FBBF2420',
+
+          // Status/semantic
           red: '#ff4d6d',
           'red-dim': '#ff4d6d20',
           amber: '#f59e0b',
           blue: '#3b82f6',
         },
         text: {
-          primary: '#f0f0f4',
-          secondary: '#8888a0',
-          muted: '#44445a',
+          primary: '#14151A',
+          secondary: '#4B4E5A',
+          muted: '#8A8F9D',
         },
       },
       animation: {

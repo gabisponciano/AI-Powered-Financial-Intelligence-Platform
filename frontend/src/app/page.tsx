@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { UploadModal } from '@/components/ui/UploadModal'
 import { EmptyState } from '@/components/ui/EmptyState'
@@ -11,6 +11,7 @@ import { AnomaliasPanel } from '@/components/dashboard/AnomaliasPanel'
 import { TransactionsList } from '@/components/dashboard/TransactionsList'
 import { ChatPanel } from '@/components/chat/ChatPanel'
 import { useUpload } from '@/hooks/useUpload'
+import clsx from 'clsx'
 
 type View = 'dashboard' | 'transacoes' |'chat' |'insights' | 'anomalias' | 'clientes'
 
@@ -27,11 +28,23 @@ export default function Home() {
   const [view, setView] = useState<View>('dashboard')
   const [showUpload, setShowUpload] = useState(false)
   const { upload, uploading, uploadId, setUploadId } = useUpload()
-  
+
+  const [mountedViews, setMountedViews] = useState<Partial<Record<View, boolean>>>({ dashboard: true })
+  const contentKey = useMemo(() => (uploadId ? `upload-${uploadId}` : 'no-upload'), [uploadId])
+
+  useEffect(() => {
+    // New upload => reset cached views/state
+    setMountedViews({ dashboard: true })
+  }, [contentKey])
 
   function handleUploadSuccess(id: number) {
     setUploadId(id)
     setView('dashboard')
+  }
+
+  function navigate(next: View) {
+    setView(next)
+    setMountedViews((prev) => ({ ...prev, [next]: true }))
   }
 
   return (
@@ -39,7 +52,7 @@ export default function Home() {
       {/* Sidebar */}
       <Sidebar
         active={view}
-        onNavigate={(id) => setView(id as View)}
+        onNavigate={(id) => navigate(id as View)}
         uploadId={uploadId}
         onUploadClick={() => setShowUpload(true)}
       />
@@ -54,7 +67,7 @@ export default function Home() {
           <header className="h-16 flex items-center justify-between px-6 border-b border-bg-border flex-shrink-0">
             <div>
               <h1
-                className="text-lg text-text-primary"
+                className="text-lg text-accent-green"
                 style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}
               >
                 {PAGE_TITLES[view]}
@@ -77,34 +90,43 @@ export default function Home() {
           </header>
 
           {/* Content */}
-          <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto" key={contentKey}>
             {!uploadId ? (
               <EmptyState onUpload={() => setShowUpload(true)} />
             ) : (
               <>
-                {view === 'dashboard' && <DashboardView uploadId={uploadId} />}
-                {view === 'transacoes' && (
-                  <div className="p-6">
+                {mountedViews.dashboard && (
+                  <div className={clsx(view === 'dashboard' ? 'block' : 'hidden')}>
+                    <DashboardView uploadId={uploadId} />
+                  </div>
+                )}
+
+                {mountedViews.transacoes && (
+                  <div className={clsx(view === 'transacoes' ? 'block' : 'hidden', 'p-6')}>
                     <TransactionsList uploadId={uploadId} />
                   </div>
                 )}
-                {view === 'chat' && (
-                  <div className="h-full">
+
+                {mountedViews.chat && (
+                  <div className={clsx(view === 'chat' ? 'block' : 'hidden', 'h-full')}>
                     <ChatPanel uploadId={uploadId} />
                   </div>
                 )}
-                {view === 'insights' && (
-                  <div className="p-6">
+
+                {mountedViews.insights && (
+                  <div className={clsx(view === 'insights' ? 'block' : 'hidden', 'p-6')}>
                     <InsightsPanel uploadId={uploadId} />
                   </div>
                 )}
-                {view === 'anomalias' && (
-                  <div className="p-6">
+
+                {mountedViews.anomalias && (
+                  <div className={clsx(view === 'anomalias' ? 'block' : 'hidden', 'p-6')}>
                     <AnomaliasPanel uploadId={uploadId} />
                   </div>
                 )}
-                {view === 'clientes' && (
-                  <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+                {mountedViews.clientes && (
+                  <div className={clsx(view === 'clientes' ? 'block' : 'hidden', 'p-6 grid grid-cols-1 lg:grid-cols-2 gap-4')}>
                     <TopClientes uploadId={uploadId} />
                     <TopCategorias uploadId={uploadId} />
                   </div>

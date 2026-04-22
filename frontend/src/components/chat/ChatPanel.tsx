@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef, useEffect } from 'react'
-import { Send, Bot, User, Loader2, Sparkles } from 'lucide-react'
+import { Send, Bot, User, Loader2, Sparkles, Trash2 } from 'lucide-react'
 import { ragAsk } from '@/lib/api'
 import clsx from 'clsx'
 
@@ -43,6 +43,12 @@ export function ChatPanel({ uploadId }: { uploadId: number | null }) {
     }
   }
 
+  function clearChat() {
+    if (loading) return
+    setMessages([])
+    setInput('')
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
@@ -56,6 +62,18 @@ export function ChatPanel({ uploadId }: { uploadId: number | null }) {
             {uploadId ? `Analisando upload #${uploadId}` : 'Todos os uploads'}
           </p>
         </div>
+        <div className="flex-1" />
+        {messages.length > 0 && (
+          <button
+            onClick={clearChat}
+            disabled={loading}
+            className="w-8 h-8 rounded-lg border border-bg-border text-text-muted hover:text-text-primary hover:border-text-muted transition-colors flex items-center justify-center"
+            aria-label="Limpar conversa"
+            title="Limpar conversa"
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
       </div>
 
       {/* Messages */}
@@ -131,9 +149,9 @@ export function ChatPanel({ uploadId }: { uploadId: number | null }) {
           <button
             onClick={() => send()}
             disabled={!input.trim() || loading}
-            className="w-7 h-7 rounded-lg flex items-center justify-center bg-accent-green disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity flex-shrink-0"
+            className="w-7 h-7 rounded-lg flex items-center justify-center bg-accent-yellow disabled:opacity-30 disabled:cursor-not-allowed hover:opacity-90 transition-opacity flex-shrink-0"
           >
-            <Send size={12} className="text-bg-base" />
+            <Send size={12} className="text-text-primary" />
           </button>
         </div>
       </div>

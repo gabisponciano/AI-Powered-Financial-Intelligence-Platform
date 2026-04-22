@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    workerThreads: true,
+    webpackBuildWorker: false,
+  },
   async rewrites() {
     return [
       {

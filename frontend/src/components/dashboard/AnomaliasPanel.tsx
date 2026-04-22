@@ -1,6 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
-import { AlertTriangle, Zap, Loader2, ChevronDown, ChevronUp } from 'lucide-react'
+import { useCallback, useEffect, useState } from 'react'
+import { AlertTriangle, Zap, Loader2, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react'
 import { fetchAnoaliasIA, AnomaliaEnrichedItem } from '@/lib/api'
 import clsx from 'clsx'
 
@@ -65,14 +65,23 @@ function AnomaliaCard({ a, index }: { a: AnomaliaEnrichedItem; index: number }) 
 
 export function AnomaliasPanel({ uploadId }: { uploadId: number }) {
   const [data, setData] = useState<{ total: number; limiar: number; anomalias: AnomaliaEnrichedItem[] } | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  const load = useCallback(async () => {
     setLoading(true)
-    fetchAnoaliasIA(uploadId)
-      .then((res) => setData({ total: res.total_anomalias, limiar: res.limiar, anomalias: res.anomalias }))
-      .finally(() => setLoading(false))
+    setError(null)
+    try {
+      const res = await fetchAnoaliasIA(uploadId)
+      setData({ total: res.total_anomalias, limiar: res.limiar, anomalias: res.anomalias })
+    } catch {
+      setError('Erro ao detectar anomalias. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
   }, [uploadId])
+
+  useEffect(() => { load() }, [load])
 
   return (
     <div className="bg-bg-surface border border-bg-border rounded-xl p-5">
@@ -80,11 +89,22 @@ export function AnomaliasPanel({ uploadId }: { uploadId: number }) {
         <h3 className="text-sm uppercase tracking-widest text-text-secondary" style={{ fontFamily: 'var(--font-mono)' }}>
           Anomalias Detectadas
         </h3>
-        {data && (
-          <span className="text-xs text-text-muted font-mono" style={{ fontFamily: 'var(--font-mono)' }}>
-            limiar: {fmt(data.limiar)}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {data && (
+            <span className="text-xs text-text-muted font-mono" style={{ fontFamily: 'var(--font-mono)' }}>
+              limiar: {fmt(data.limiar)}
+            </span>
+          )}
+          <button
+            onClick={load}
+            disabled={loading}
+            className="w-7 h-7 rounded-lg border border-bg-border text-text-muted hover:text-text-primary hover:border-text-muted transition-colors flex items-center justify-center"
+            aria-label="Atualizar anomalias"
+            title="Atualizar"
+          >
+            <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+          </button>
+        </div>
       </div>
 
       {loading && (
@@ -94,13 +114,22 @@ export function AnomaliasPanel({ uploadId }: { uploadId: number }) {
         </div>
       )}
 
-      {!loading && data && data.anomalias.length === 0 && (
+      {error && !loading && (
+        <div className="py-8 text-center">
+          <p className="text-sm text-accent-red">{error}</p>
+          <button onClick={load} className="text-xs text-text-muted mt-2 hover:text-text-primary transition-colors">
+            Tentar novamente
+          </button>
+        </div>
+      )}
+
+      {!loading && !error && data && data.anomalias.length === 0 && (
         <div className="py-10 text-center">
           <p className="text-sm text-accent-green">✓ Nenhuma anomalia detectada</p>
         </div>
       )}
 
-      {!loading && data && (
+      {!loading && !error && data && (
         <div className="space-y-2">
           {data.anomalias.map((a, i) => <AnomaliaCard key={a.id} a={a} index={i} />)}
         </div>
