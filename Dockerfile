@@ -1,22 +1,31 @@
-FROM node:20-alpine AS deps
+FROM python:3.12-slim
+
 WORKDIR /app
-COPY package.json ./
-RUN npm install
 
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-RUN npm run build
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
-FROM node:20-alpine AS runner
-WORKDIR /app
-ENV NODE_ENV=production
+# Dependencies (esp. for pandas / sklearn wheels). Keep minimal.
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+      alembic==1.18.4 \
+      fastapi==0.136.0 \
+      langchain==1.2.15 \
+      langchain-chroma==1.1.0 \
+      langchain-community==0.4.1 \
+      langchain-core==1.3.0 \
+      langchain-ollama==1.1.0 \
+      openpyxl==3.1.5 \
+      pandas==3.0.2 \
+      python-dotenv==1.2.2 \
+      python-multipart==0.0.26 \
+      requests==2.33.1 \
+      scikit-learn==1.8.0 \
+      sqlalchemy==2.0.49 \
+      uvicorn==0.44.0
 
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/public ./public
+COPY backend/ /app/
 
-EXPOSE 3000
-CMD ["npm", "start"]
+EXPOSE 8000
+
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

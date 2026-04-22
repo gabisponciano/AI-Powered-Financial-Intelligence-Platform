@@ -40,7 +40,7 @@ export function TopClientes({ uploadId }: { uploadId: number }) {
   return (
     <div className="bg-bg-surface border border-bg-border rounded-xl p-5">
       <h3 className="text-sm uppercase tracking-widest text-text-secondary mb-5" style={{ fontFamily: 'var(--font-mono)' }}>
-        Top Clientes
+        Soma de Pagamentos por Cliente
       </h3>
       {loading ? (
         <div className="space-y-4">{Array(5).fill(0).map((_, i) => (
@@ -86,7 +86,7 @@ export function PiorClientes({ uploadId }: { uploadId: number }) {
   return (
     <div className="bg-bg-surface border border-bg-border rounded-xl p-5">
       <h3 className="text-sm uppercase tracking-widest text-text-secondary mb-5" style={{ fontFamily: 'var(--font-mono)' }}>
-        Piores Clientes (Atraso)
+        Soma de Atrasos por Cliente
       </h3>
       {loading ? (
         <div className="space-y-4">{Array(5).fill(0).map((_, i) => (

@@ -5,7 +5,7 @@ from typing import List, Optional
 import os
 
 
-PERSIST_DIR = "./chroma_db"
+PERSIST_DIR = os.getenv("CHROMA_PERSIST_DIR", "./chroma_db")
 
 
 def build_retriever_from_db(transactions: List, upload_id: Optional[int] = None, k: int = 20):
@@ -16,7 +16,8 @@ def build_retriever_from_db(transactions: List, upload_id: Optional[int] = None,
 
     try:
         embeddings = OllamaEmbeddings(
-            model="nomic-embed-text"
+            model=os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text"),
+            base_url=os.getenv("OLLAMA_BASE_URL"),
         )
         collection_name = f"transactions_{upload_id}" if upload_id else "transactions_all"
 

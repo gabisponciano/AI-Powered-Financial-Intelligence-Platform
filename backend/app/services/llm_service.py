@@ -2,9 +2,10 @@ import requests
 import json
 import pandas as pd
 from typing import Optional
+import os
 
-OLLAMA_URL = "http://localhost:11434/api/generate"
-MODEL = "mistral"  # llama3 = LLaMA 3 8B no Ollama
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
+MODEL = os.getenv("OLLAMA_MODEL", "mistral")  # exemplo: "llama3", "mistral"
 
 
 def _call_ollama(prompt: str, system: Optional[str] = None, temperature: float = 0.3) -> str:
@@ -39,8 +40,6 @@ def _call_ollama(prompt: str, system: Optional[str] = None, temperature: float =
     except Exception as e:
         raise RuntimeError(f"Erro ao chamar Ollama: {str(e)}")
 
-
-# 2. GERAÇÃO DE INSIGHTS AUTOMÁTICOS
 
 INSIGHTS_SYSTEM = (
     "Você é um analista financeiro especialista em dados de vendas e recebíveis. "
@@ -81,7 +80,6 @@ def generate_insights(kpis: dict, evolucao: list[dict], top_clientes: list[dict]
 
     raw = _call_ollama(prompt, system=INSIGHTS_SYSTEM, temperature=0.4)
 
-    # Tenta parsear JSON da resposta
     try:
         # Remove possíveis ```json ``` wrappers
         clean = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
@@ -98,8 +96,6 @@ def generate_insights(kpis: dict, evolucao: list[dict], top_clientes: list[dict]
                 }
             ]
         }
-
-# 3. IDENTIFICAÇÃO DE PADRÕES E ANOMALIAS
 
 ANOMALY_SYSTEM = (
     "Você é um especialista em detecção de fraudes e anomalias financeiras. "
@@ -163,9 +159,6 @@ def explain_anomalies(anomalies: list[dict], stats: dict) -> list[dict]:
             {**t, "explicacao_ia": "Valor acima do limiar estatístico (média + 2σ).", "severidade": "media"}
             for t in anomalies[:10]
         ]
-
-
-# 4. CONSULTA EM LINGUAGEM NATURAL
 
 
 QUERY_SYSTEM = (

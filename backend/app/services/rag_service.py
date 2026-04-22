@@ -1,5 +1,6 @@
 from langchain_ollama.llms import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
+import os
 
 _model = None  # Cache
 
@@ -20,7 +21,10 @@ def get_model():
     """Inicializa o modelo na primeira utilização (lazy loading)"""
     global _model
     if _model is None:
-        _model = OllamaLLM(model="mistral")
+        _model = OllamaLLM(
+            model=os.getenv("OLLAMA_MODEL", "mistral"),
+            base_url=os.getenv("OLLAMA_BASE_URL"),
+        )
     return _model
 
 def rag_config(context: str, question: str) -> str:
