@@ -32,7 +32,7 @@ def ask(payload: QuestionRequest, session: Session = Depends(get_db)):
 
     question_lower = payload.question.lower()
     is_aggregate = any(kw in question_lower for kw in AGGREGATE_KEYWORDS)
-    k = 50 if is_aggregate else 30
+    k = 80 if is_aggregate else 30
 
     retriever = build_retriever_from_db(
         transactions=transactions,

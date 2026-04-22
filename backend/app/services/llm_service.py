@@ -99,26 +99,59 @@ def generate_insights(kpis: dict, evolucao: list[dict], top_clientes: list[dict]
 
 ANOMALY_SYSTEM = (
     "Você é um especialista em detecção de fraudes e anomalias financeiras. "
-    "Analise as transações suspeitas e explique em português por que cada uma é anômala. "
-    "Seja específico e direto."
+    "Analise as transações considerando não apenas valores extremos, mas também padrões incomuns.\n\n"
+    
+    "Considere como anomalias:\n"
+    "- Valores acima do esperado (estatístico)\n"
+    "- Mudanças de comportamento do cliente\n"
+    "- Frequência incomum de transações\n"
+    "- Descrições incomuns ou suspeitas\n"
+    "- Horários atípicos\n"
+    "- Combinação de fatores aparentemente normais, mas estranhos juntos\n\n"
+    
+    "Classifique a severidade:\n"
+    "- alta: forte indício de fraude ou valor muito fora do padrão\n"
+    "- media: comportamento suspeito\n"
+    "- baixa: leve desvio ou padrão incomum\n\n"
+    
+    "Seja objetivo, específico e direto."
 )
 
 def explain_anomalies(anomalies: list[dict], stats: dict) -> list[dict]:
-    """
-    Recebe lista de transações anômalas (detectadas estatisticamente)
-    e enriquece com explicação em linguagem natural.
-    """
     if not anomalies:
         return []
 
+    # 🔹 Score de risco (simplificado)
+    def risk_score(t):
+        score = 0
+
+        amount = float(t.get("amount", 0))
+        status = str(t.get("status", "")).lower()
+
+        # Valor muito alto (global)
+        if amount > stats.get("threshold", 0):
+            score += 3
+        elif amount > stats.get("mean", 0):
+            score += 1  # levemente acima da média
+
+        # Atraso
+        if status == "atrasado":
+            score += 2
+
+        return score
+
+    # Ordena pelas mais suspeitas
+    anomalies_sorted = sorted(anomalies, key=risk_score, reverse=True)
+
     stats_text = (
-        f"Média das transações: R$ {stats.get('mean', 0):.2f}, "
+        f"Média: R$ {stats.get('mean', 0):.2f}, "
         f"Desvio padrão: R$ {stats.get('std', 0):.2f}, "
-        f"Máximo normal (~média + 2σ): R$ {stats.get('threshold', 0):.2f}"
+        f"Limite alto (~2σ): R$ {stats.get('threshold', 0):.2f}, "
+        f"Total de transações: {stats.get('count', 0)}"
     )
 
     lines = []
-    for i, t in enumerate(anomalies[:10]):
+    for i, t in enumerate(anomalies_sorted[:10]):
         lines.append(
             f"{i+1}. Valor: R$ {float(t.get('amount', 0)):.2f} | "
             f"Cliente: {t.get('customer', 'N/A')} | "
@@ -129,35 +162,40 @@ def explain_anomalies(anomalies: list[dict], stats: dict) -> list[dict]:
 
     prompt = (
         f"Contexto estatístico: {stats_text}\n\n"
-        f"Transações suspeitas identificadas:\n" + "\n".join(lines) + "\n\n"
-        f"Para cada transação, gere uma explicação curta (1-2 frases) do por que ela é anômala.\n"
-        f"Responda no formato JSON:\n"
-        f'{{"anomalias": [{{"id": 1, "explicacao": "...", "severidade": "alta|media|baixa"}}]}}\n'
-        f"Responda APENAS com o JSON."
+        f"Transações suspeitas:\n" + "\n".join(lines) + "\n\n"
+        "Considere valores fora do padrão e comportamento geral.\n\n"
+        'Formato JSON:\n'
+        '{"anomalias": [{"id": 1, "explicacao": "...", "severidade": "alta|media|baixa"}]}\n'
+        "Responda APENAS com o JSON."
     )
 
-    raw = _call_ollama(prompt, system=ANOMALY_SYSTEM, temperature=0.2)
+    raw = _call_ollama(prompt, system=ANOMALY_SYSTEM, temperature=0.35)
 
     try:
         clean = raw.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
         data = json.loads(clean)
         explicacoes = {item["id"]: item for item in data.get("anomalias", [])}
 
-        # Mescla explicações com os dados originais
         enriched = []
-        for i, t in enumerate(anomalies[:10]):
+        for i, t in enumerate(anomalies_sorted[:10]):
             exp = explicacoes.get(i + 1, {})
             enriched.append({
                 **t,
-                "explicacao_ia": exp.get("explicacao", "Valor significativamente acima da média histórica."),
+                "explicacao_ia": exp.get("explicacao", "Valor fora do padrão esperado."),
                 "severidade": exp.get("severidade", "media"),
+                "risk_score": risk_score(t)
             })
         return enriched
+
     except Exception:
-        # Fallback sem explicação detalhada
         return [
-            {**t, "explicacao_ia": "Valor acima do limiar estatístico (média + 2σ).", "severidade": "media"}
-            for t in anomalies[:10]
+            {
+                **t,
+                "explicacao_ia": "Valor fora do padrão estatístico.",
+                "severidade": "media",
+                "risk_score": risk_score(t)
+            }
+            for t in anomalies_sorted[:10]
         ]
 
 
