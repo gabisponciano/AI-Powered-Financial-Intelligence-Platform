@@ -2,6 +2,10 @@
 
 Plataforma full-stack para **upload de transações (.csv/.xlsx)**, **cálculo de KPIs** e **análises com IA** (insights, anomalias explicadas e chat estilo RAG), com foco em rodar de forma simples e local.
 
+<img width="1912" height="953" alt="image" src="https://github.com/user-attachments/assets/d56159d9-f66f-4443-83c0-6871dc794a40" />
+<img width="1908" height="963" alt="image" src="https://github.com/user-attachments/assets/8658fce7-12f2-40e5-941a-bf255ad8ee8f" />
+
+
 ## Visão geral
 
 - **Backend (FastAPI)**: ingestão do arquivo, persistência (SQLite), endpoints de análise e endpoints de IA.
