@@ -56,7 +56,7 @@ export function ChatPanel({ uploadId }: { uploadId: number | null }) {
           <Sparkles size={14} className="text-accent-green" />
         </div>
         <div>
-          <h2 className="text-sm font-500 text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}>Chat IA</h2>
+          <h2 className="text-sm font-500 text-text-primary" style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}>Chat</h2>
           <p className="text-xs text-text-muted">
             {uploadId ? `Analisando upload #${uploadId}` : 'Todos os uploads'}
           </p>

@@ -34,7 +34,7 @@ export function InsightsPanel({ uploadId }: { uploadId: number }) {
     <div className="bg-bg-surface border border-bg-border rounded-xl p-5 h-full">
       <div className="flex items-center justify-between mb-5">
         <h3 className="text-sm uppercase tracking-widest text-text-secondary" style={{ fontFamily: 'var(--font-mono)' }}>
-          Insights IA
+          Insights
         </h3>
         <button
           onClick={load}

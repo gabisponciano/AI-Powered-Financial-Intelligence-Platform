@@ -114,7 +114,7 @@ uv run uvicorn app.main:app --reload
 Em outro terminal:
 
 ```powershell
-ollama serve
+ollama run 'model'
 ollama pull mistral
 ollama pull nomic-embed-text
 ```
