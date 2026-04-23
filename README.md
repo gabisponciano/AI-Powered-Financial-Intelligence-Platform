@@ -1,4 +1,4 @@
-# AI-Powered Financial Intelligence Platform (Finflow)
+# AI-Powered Financial Intelligence Platform (FinanciAI)
 
 Plataforma full-stack para **upload de transações (.csv/.xlsx)**, **cálculo de KPIs** e **análises com IA** (insights, anomalias explicadas e chat estilo RAG), com foco em rodar de forma simples e local.
 
